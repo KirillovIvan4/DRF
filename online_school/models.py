@@ -1,6 +1,8 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.conf import settings
+from django.core.exceptions import ValidationError
+from .validators import validate_youtube_link
 
 NULLBLE = {"blank": True, "null": True}
 
@@ -28,7 +30,7 @@ class Lesson(models.Model):
     name = models.CharField(max_length=100, verbose_name="название урока")
     description = models.TextField(verbose_name="описание урока")
     preview = models.ImageField(upload_to="lesson/", verbose_name="превью", **NULLBLE)
-    link_video = models.CharField(max_length=100, verbose_name="ссылка на видео")
+    link_video = models.URLField(verbose_name="ссылка на видео")
     creator = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -44,6 +46,11 @@ class Lesson(models.Model):
 
     def __str__(self):
         return f"{self.name}"
+
+    def clean(self):
+        if self.link_video:
+            validate_youtube_link(self.link_video)
+        super().clean()
 
     class Meta:
         verbose_name = "урок"

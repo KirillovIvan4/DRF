@@ -1,11 +1,15 @@
 from rest_framework import serializers
 
 from online_school.models import Сourse, Lesson, Payments
+from online_school.validators import validate_youtube_link
+
 
 class LessonSerializer(serializers.ModelSerializer):
+    link_video = serializers.URLField(validators=[validate_youtube_link])
     class Meta:
         model = Lesson
         fields = '__all__'
+
 
 class СourseSerializer(serializers.ModelSerializer):
     last_lesson = serializers.SerializerMethodField()
