@@ -1,18 +1,20 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.conf import settings
+from django.core.exceptions import ValidationError
+from .validators import validate_youtube_link
 
 NULLBLE = {"blank": True, "null": True}
 
 
-class Сourse(models.Model):
+class Course(models.Model):
     name = models.CharField(max_length=100, verbose_name="название курса")
     description = models.TextField(verbose_name="описание курса")
-    preview = models.ImageField(upload_to="сourse/", verbose_name="превью", **NULLBLE)
+    preview = models.ImageField(upload_to="course/", verbose_name="превью", **NULLBLE)
     creator = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
-        related_name="сourse",
+        related_name="course",
         verbose_name="создатель",
         **NULLBLE)
 
@@ -28,15 +30,15 @@ class Lesson(models.Model):
     name = models.CharField(max_length=100, verbose_name="название урока")
     description = models.TextField(verbose_name="описание урока")
     preview = models.ImageField(upload_to="lesson/", verbose_name="превью", **NULLBLE)
-    link_video = models.CharField(max_length=100, verbose_name="ссылка на видео")
+    link_video = models.URLField(verbose_name="ссылка на видео", **NULLBLE)
     creator = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         related_name="lesson",
         verbose_name="создатель",
         **NULLBLE)
-    сourse = models.ForeignKey(
-        Сourse,
+    course = models.ForeignKey(
+        Course,
         on_delete=models.SET_NULL,
         related_name="lesson",
         verbose_name="курс",
@@ -45,9 +47,15 @@ class Lesson(models.Model):
     def __str__(self):
         return f"{self.name}"
 
+    def clean(self):
+        if self.link_video:
+            validate_youtube_link(self.link_video)
+        super().clean()
+
     class Meta:
         verbose_name = "урок"
         verbose_name_plural = "уроки"
+        ordering = ['id']
 
 
 class Payments(models.Model):
@@ -71,8 +79,8 @@ class Payments(models.Model):
         verbose_name="пользователь",
         **NULLBLE)
     paid_course = models.ForeignKey(
-        Сourse,
-        on_delete=models.SET_NULL,
+        Course,
+        on_delete=models.CASCADE,
         related_name="payments",
         verbose_name="оплаченный курс",
         **NULLBLE)
@@ -89,3 +97,18 @@ class Payments(models.Model):
     class Meta:
         verbose_name = "платёж"
         verbose_name_plural = "платежи"
+
+class Subscription(models.Model):
+    subscription_activated = models.BooleanField(default=False, verbose_name="подписка активирована")
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        related_name="subscription",
+        verbose_name="пользователь",
+        **NULLBLE)
+    course = models.ForeignKey(
+        Course,
+        on_delete=models.SET_NULL,
+        related_name="subscription",
+        verbose_name="курс",
+        **NULLBLE)

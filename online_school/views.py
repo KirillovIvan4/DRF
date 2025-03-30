@@ -1,16 +1,19 @@
 from rest_framework import viewsets, generics
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
-from online_school.models import Сourse, Lesson, Payments
-from online_school.serializers import СourseSerializer, LessonSerializer, PaymentsSerializer
+from online_school.models import Course, Lesson, Payments, Subscription
+from online_school.paginations import CastomPagination
+from online_school.serializers import CourseSerializer, LessonSerializer, PaymentsSerializer, SubscriptionSerializer
 from rest_framework.permissions import IsAuthenticated, NOT
-
+from rest_framework.views import APIView
+from rest_framework.response import Response
 from users.permissions import IsModer, IsNotModer, IsCreator
 
 
-class СourseViewSet(viewsets.ModelViewSet):
-    serializer_class = СourseSerializer
-    queryset = Сourse.objects.all()
+class CourseViewSet(viewsets.ModelViewSet):
+    serializer_class = CourseSerializer
+    queryset = Course.objects.all()
+    pagination_class = CastomPagination
 
     def get_permissions(self):
         if self.action in ["create"]:
@@ -37,6 +40,7 @@ class LessonCreateAPIView(generics.CreateAPIView):
 class LessonListAPIView(generics.ListAPIView):
     serializer_class = LessonSerializer
     queryset = Lesson.objects.all()
+    pagination_class = CastomPagination
 
 class LessonRetrieveAPIView(generics.RetrieveAPIView):
     serializer_class = LessonSerializer
@@ -53,6 +57,7 @@ class LessonUpdateAPIView(generics.UpdateAPIView):
         return super().get_permissions()
 
 class LessonDestroyAPIView(generics.DestroyAPIView):
+    queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
     permission_classes = [IsAuthenticated]
 
@@ -81,3 +86,20 @@ class PaymentsListAPIView(generics.ListAPIView):
     filterset_fields = ('lesson', 'course')
     search_fields = ('method_payment',)
     ordering_fields = ('payment_date',)
+
+class SubscriptionAPIView(APIView):
+    serializer_class = SubscriptionSerializer
+
+    def post(self, *args, **kwargs):
+        user = self.request.user
+        course_id = self.request.data.get('course')
+        course = generics.get_object_or_404(Course, pk=course_id)
+        sub_item = Subscription.objects.all().filter(user=user).filter(course=course)
+
+        if sub_item.exists():
+            sub_item.delete()
+            message = 'Подписка отключена'
+        else:
+            Subscription.objects.create(user=user, course=course)
+            message = 'Подписка включена'
+        return Response({"message": message})
