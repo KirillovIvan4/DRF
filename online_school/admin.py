@@ -1,10 +1,10 @@
 from django.contrib import admin
 
-from online_school.models import Сourse, Lesson, Payments
+from online_school.models import Course, Lesson, Payments
 
 
-@admin.register(Сourse)
-class СourseAdmin(admin.ModelAdmin):
+@admin.register(Course)
+class CourseAdmin(admin.ModelAdmin):
     list_display = ('pk', 'name',)
     list_filter = ('name',)
     search_fields = ('name',)
