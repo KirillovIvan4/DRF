@@ -11,6 +11,7 @@ class Course(models.Model):
     name = models.CharField(max_length=100, verbose_name="название курса")
     description = models.TextField(verbose_name="описание курса")
     preview = models.ImageField(upload_to="course/", verbose_name="превью", **NULLBLE)
+    price_course = models.PositiveIntegerField(default=0, verbose_name="Цена за курс")
     creator = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -31,6 +32,7 @@ class Lesson(models.Model):
     description = models.TextField(verbose_name="описание урока")
     preview = models.ImageField(upload_to="lesson/", verbose_name="превью", **NULLBLE)
     link_video = models.URLField(verbose_name="ссылка на видео", **NULLBLE)
+    price_lesson = models.PositiveIntegerField(default=0, verbose_name="Цена за урок")
     creator = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -72,6 +74,8 @@ class Payments(models.Model):
                                       verbose_name="способ оплаты")
     payment_amount = models.PositiveIntegerField(verbose_name="сумма оплаты")
     payment_date = models.DateTimeField(auto_now_add=True, verbose_name="дата оплаты")
+    session_id = models.CharField(max_length=225, verbose_name="способ оплаты",**NULLBLE)
+    session_link = models.URLField(max_length=400, verbose_name="ссылка на оплату",**NULLBLE)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,

@@ -22,14 +22,16 @@ class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
         fields = '__all__'
+    def get_subscription(self, instance):
+        pass
+
 
     def get_last_lesson(self, instance):
         if instance.lesson.all():
             return instance.lesson.all().count()
         return 0
 
-    def get_subscription(self, instance):
-        pass
+
 
 
 class PaymentsSerializer(serializers.ModelSerializer):
@@ -37,9 +39,9 @@ class PaymentsSerializer(serializers.ModelSerializer):
         model = Payments
         fields = '__all__'
 
+
 class SubscriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subscription
         fields = '__all__'
-
 
