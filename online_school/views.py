@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from rest_framework import viewsets, generics
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
@@ -7,6 +8,8 @@ from online_school.serializers import CourseSerializer, LessonSerializer, Paymen
 from rest_framework.permissions import IsAuthenticated, NOT
 from rest_framework.views import APIView
 from rest_framework.response import Response
+
+from online_school.services import create_stripe_price, create_stripe_session, create_stripe_product
 from users.permissions import IsModer, IsNotModer, IsCreator
 
 
@@ -70,9 +73,25 @@ class PaymentsCreateAPIView(generics.CreateAPIView):
     serializer_class = PaymentsSerializer
 
     def perform_create(self, serializer):
-        payments = serializer.save()
-        payments.user = self.request.user
-        payments.save()
+        paid_course = serializer.validated_data.get('paid_course')
+        paid_lesson = serializer.validated_data.get('paid_lesson')
+
+        if paid_course:
+            payment_amount = paid_course.price_course
+            name = paid_course.name
+            description = paid_course.description
+        elif paid_lesson:
+            payment_amount = paid_lesson.price_lesson
+            name = paid_lesson.name
+            description = paid_lesson.description
+        else:
+            raise ValidationError("Не указан ни курс, ни урок для оплаты")
+        payments = serializer.save(user=self.request.user, payment_amount=payment_amount)
+        product_id = create_stripe_product(name, description)
+        price = create_stripe_price(payment_amount, product_id)
+        session_id, session_link = create_stripe_session(price)
+        payments.session_id = session_id
+        payments.session_link = session_link
 
     def get_permissions(self):
         if self.request.method == 'POST':
