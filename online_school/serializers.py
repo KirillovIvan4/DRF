@@ -5,6 +5,7 @@ from rest_framework.response import Response
 
 from online_school.models import Course, Lesson, Payments, Subscription
 from online_school.validators import validate_youtube_link
+from users.serializers import UserSerializer
 
 
 class LessonSerializer(serializers.ModelSerializer):
@@ -15,8 +16,10 @@ class LessonSerializer(serializers.ModelSerializer):
 
 
 class CourseSerializer(serializers.ModelSerializer):
+    lessons = LessonSerializer(many=True, read_only=True)  # Пример для lessons
+    creator = UserSerializer(read_only=True)
     last_lesson = serializers.SerializerMethodField()
-    lesson = LessonSerializer(many=True)
+
     subscription = serializers.SerializerMethodField()
 
     class Meta:

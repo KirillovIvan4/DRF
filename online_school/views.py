@@ -11,6 +11,7 @@ from rest_framework.response import Response
 
 from online_school.services import create_stripe_price, create_stripe_session, create_stripe_product
 from users.permissions import IsModer, IsNotModer, IsCreator
+from online_school.tasks import test_calery, mail_update_course_info
 
 
 class CourseViewSet(viewsets.ModelViewSet):
@@ -27,6 +28,12 @@ class CourseViewSet(viewsets.ModelViewSet):
             self.permission_classes = [IsAuthenticated]
         return super().get_permissions()
 
+    def perform_update(self, serializer):
+        updated_course = serializer.save()
+        mail_update_course_info.delay(updated_course.id)
+        test_calery.delay()
+
+
 class LessonCreateAPIView(generics.CreateAPIView):
     serializer_class = LessonSerializer
 
@@ -34,6 +41,7 @@ class LessonCreateAPIView(generics.CreateAPIView):
         lesson = serializer.save()
         lesson.creator =self.request.user
         lesson.save()
+        test_calery.delay()
 
     def get_permissions(self):
         if self.request.method == 'POST':
@@ -52,7 +60,7 @@ class LessonRetrieveAPIView(generics.RetrieveAPIView):
 class LessonUpdateAPIView(generics.UpdateAPIView):
     serializer_class = LessonSerializer
     queryset = Lesson.objects.all()
-    permission_classes = [IsAuthenticated]
+    #permission_classes = [IsAuthenticated]
 
     def get_permissions(self):
         if self.request.method == 'POST':
