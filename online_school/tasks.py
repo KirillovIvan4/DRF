@@ -1,12 +1,11 @@
 from celery import shared_task
 from django.core.mail import send_mail
-from datetime import timedelta
-from django.utils import timezone
+
 
 from config.settings import EMAIL_HOST_USER
 from online_school.models import Subscription
 
-from users.models import User
+
 
 
 @shared_task
