@@ -1,7 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.conf import settings
-from django.core.exceptions import ValidationError
 from .validators import validate_youtube_link
 
 NULLBLE = {"blank": True, "null": True}

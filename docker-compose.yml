@@ -16,6 +16,39 @@ services:
     depends_on:
       db:
         condition: service_healthy
+  redis:
+    image: "redis:latest"
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis_data:/data
+    healthcheck:
+      test: [ "CMD-SHELL", "redis-cli ping | grep PONG" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+    celery:
+      build:
+        context: .
+      command: celery -A config worker -l INFO
+      volumes:
+        - .:/app
+      depends_on:
+        - db
+        - redis
+
+    celery_beat:
+      build:
+        context: .
+      command: celery -A config beat -l INFO -S django
+      volumes:
+        - .:/app
+      depends_on:
+        - db
+        - redis
+        - celery
+
   db:
     image: postgres:16
     env_file:
@@ -32,6 +65,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+
 
 volumes:
   postgres_data:
