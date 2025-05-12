@@ -1,0 +1,102 @@
+services:
+  web:
+    build: .
+    command: >
+      sh -c "while ! nc -z db 5432; do sleep 2; echo 'Waiting for database...'; done &&
+      python manage.py migrate &&
+      python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/code
+      - static_volume:/code/static
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file:
+      - .env
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/health/" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  db:
+    image: postgres:16.0
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "12345"  # Обязательно в кавычках
+      POSTGRES_DB: drf
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  redis:
+    image: "redis:latest"
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis_data:/data
+    healthcheck:
+      test: [ "CMD-SHELL", "redis-cli ping | grep PONG" , "pg_isready -U your_db_user -d your_db_name"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  celery:
+    build:
+      context: .
+    command: >
+      sh -c "while ! nc -z db 5432; do sleep 2; echo 'Waiting for database...'; done &&
+      celery -A config worker --loglevel=info --uid=celeryuser"
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings
+      - CELERY_BROKER_URL=redis://redis:6379/0  # Добавьте это
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    volumes:
+      - .:/app
+    depends_on:
+      web:
+          condition: service_started
+
+
+  celery_beat:
+    build:
+      context: .
+    command: celery -A config beat -l info
+    environment:
+      POSTGRES_HOST: db  # Используем имя сервиса
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "12345"
+      POSTGRES_DB: mydatabase
+      CELERY_BROKER_URL: redis://redis:6379/0
+      DJANGO_SETTINGS_MODULE: config.settings
+
+
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+      - redis
+      - celery
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./static:/app/static  # Если используете статические файлы
+      - ./media:/app/media    # Если используете медиа файлы
+    depends_on:
+      web:
+        condition: service_healthy
+
+
+volumes:
+  redis_data:
+  postgres_data:
+  static_volume:
