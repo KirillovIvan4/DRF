@@ -55,7 +55,7 @@ services:
       celery -A config worker --loglevel=info --uid=celeryuser"
     environment:
       - DJANGO_SETTINGS_MODULE=config.settings
-      - CELERY_BROKER_URL=redis://redis:6379/0  # Добавьте это
+      - CELERY_BROKER_URL=redis://redis:6379/0  
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
     volumes:
       - .:/app
