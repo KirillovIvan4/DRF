@@ -33,7 +33,7 @@ DEBUG = True if os.getenv('DEBUG') == "True" else False
 if DEBUG:
     HEALTH_CHECK_WHITELIST = ['127.0.0.1', 'localhost', 'web']
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'web']
+ALLOWED_HOSTS = [*]
 
 
 # Application definition
