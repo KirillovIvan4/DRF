@@ -3,9 +3,10 @@ from django.urls import path
 from online_school.apps import OnlineSchoolConfig
 from rest_framework.routers import DefaultRouter
 
-from online_school.views import (CourseViewSet, LessonCreateAPIView, \
-                                 LessonListAPIView, LessonRetrieveAPIView, \
-                                 LessonUpdateAPIView, LessonDestroyAPIView, PaymentsCreateAPIView, \
+from online_school.views import (CourseViewSet, LessonCreateAPIView,
+                                 LessonListAPIView, LessonRetrieveAPIView,
+                                 LessonUpdateAPIView, LessonDestroyAPIView,
+                                 PaymentsCreateAPIView,
                                  PaymentsListAPIView, SubscriptionAPIView)
 
 app_name = OnlineSchoolConfig.name
@@ -19,7 +20,9 @@ urlpatterns = [
                       'lesson/create/',
                       LessonCreateAPIView.as_view(),
                       name='lesson-create'),
-                  path('lesson/', LessonListAPIView.as_view(), name='lesson-list'),
+                  path('lesson/',
+                       LessonListAPIView.as_view(),
+                       name='lesson-list'),
                   path(
                       'lesson/<int:pk>/',
                       LessonRetrieveAPIView.as_view(),
@@ -33,10 +36,14 @@ urlpatterns = [
                       LessonDestroyAPIView.as_view(),
                       name='lesson-delete'),
                   # Платежи
-                  path('payments/', PaymentsListAPIView.as_view(), name='payments-list'),
+                  path('payments/',
+                       PaymentsListAPIView.as_view(),
+                       name='payments-list'),
                   path(
                       'payments/create/',
                       PaymentsCreateAPIView.as_view(),
                       name='payments-create'),
-                  path("subscription/", SubscriptionAPIView.as_view(), name="subscription"),
+                  path("subscription/",
+                       SubscriptionAPIView.as_view(),
+                       name="subscription"),
               ] + router.urls

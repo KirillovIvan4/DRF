@@ -4,16 +4,16 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 from online_school.models import Course, Lesson, Payments, Subscription
 from online_school.paginations import CastomPagination
-from online_school.serializers import (CourseSerializer, \
-                                       LessonSerializer, \
-                                       PaymentsSerializer, \
+from online_school.serializers import (CourseSerializer,
+                                       LessonSerializer,
+                                       PaymentsSerializer,
                                        SubscriptionSerializer)
 from rest_framework.permissions import IsAuthenticated, NOT
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from online_school.services import (create_stripe_price, \
-                                    create_stripe_session, \
+from online_school.services import (create_stripe_price,
+                                    create_stripe_session,
                                     create_stripe_product)
 from users.permissions import IsModer, IsNotModer, IsCreator
 from online_school.tasks import test_calery, mail_update_course_info
@@ -134,7 +134,9 @@ class SubscriptionAPIView(APIView):
         user = self.request.user
         course_id = self.request.data.get('course')
         course = generics.get_object_or_404(Course, pk=course_id)
-        sub_item = Subscription.objects.all().filter(user=user).filter(course=course)
+        sub_item = (Subscription.objects.all()
+                    .filter(user=user)
+                    .filter(course=course))
 
         if sub_item.exists():
             sub_item.delete()
