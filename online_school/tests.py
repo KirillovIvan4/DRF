@@ -2,7 +2,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from online_school.models import Course, Lesson, Payments, Subscription
+from online_school.models import Course, Lesson, Subscription
 from users.models import User
 
 

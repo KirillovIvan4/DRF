@@ -1,11 +1,9 @@
 from rest_framework.serializers import ValidationError
 from urllib.parse import urlparse
-import re
 
 
 allowed_video_link = [
     'www.youtube.com',
-
 ]
 
 
