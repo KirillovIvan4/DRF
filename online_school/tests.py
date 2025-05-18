@@ -1,6 +1,7 @@
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
+from unittest.mock import patch  # Добавляем импорт mock
 
 from online_school.models import Course, Lesson, Subscription
 from users.models import User
@@ -35,7 +36,10 @@ class LessonTestCase(APITestCase):
             data.get('name'), self.lesson.name
         )
 
-    def test_lesson_create(self):
+    @patch('online_school.views.test_celery.delay')  # Мокаем Celery задачу
+    def test_lesson_create(self, mock_celery):
+        mock_celery.return_value = None  # Задаем возвращаемое значение
+
         url = reverse('online_school:lesson-create')
         data = {
             'name': 'Урок 2',
@@ -52,6 +56,7 @@ class LessonTestCase(APITestCase):
         self.assertEqual(
             Lesson.objects.all().count(), 2
         )
+        mock_celery.assert_called_once()  # Проверяем, что задача была вызвана
 
     def test_lesson_update(self):
         url = reverse('online_school:lesson-update', args=(self.lesson.pk,))
@@ -81,7 +86,6 @@ class LessonTestCase(APITestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
         self.assertEqual(response.data['count'], 1)
         self.assertIsNone(response.data['next'])
         self.assertIsNone(response.data['previous'])
@@ -101,7 +105,6 @@ class LessonTestCase(APITestCase):
 
 
 class SubscriptionTestCase(APITestCase):
-
     def setUp(self):
         # Подготовка данных перед каждым тестом
         self.user = User.objects.create(email='admin@admin.com')
