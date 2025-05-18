@@ -89,8 +89,21 @@ jobs:
           python manage.py migrate users
           python manage.py migrate
 
+      - name: Prepare test database
+        run: |
+          # Создаем тестовую базу данных явно
+          PGPASSWORD=postgres psql -h localhost -U postgres -c "CREATE DATABASE test_test_db;"
+
+          # Применяем миграции к тестовой базе
+          python manage.py migrate --database=default --run-syncdb
+
+          # Проверяем состояние миграций
+          python manage.py showmigrations
+
       - name: Run tests
-        run: python manage.py test
+        run: |
+          # Запускаем тесты с явным указанием создать тестовую БД
+          python manage.py test --keepdb --noinput
 
   build:
     runs-on: ubuntu-latest
