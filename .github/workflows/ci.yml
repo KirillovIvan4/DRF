@@ -91,25 +91,30 @@ jobs:
 
       - name: Setup test environment
         run: |
-          # Удаляем старые миграции
+          # 1. Удаляем все миграции (кроме __init__.py)
           find . -path "*/migrations/*.py" -not -name "__init__.py" -delete
           find . -path "*/migrations/*.pyc" -delete
-
-          # Создаем новые миграции
+          
+          # 2. Удаляем и пересоздаем основную БД
+          PGPASSWORD=postgres psql -h localhost -U postgres -c "DROP DATABASE IF EXISTS test_db;"
+          PGPASSWORD=postgres psql -h localhost -U postgres -c "CREATE DATABASE test_db WITH OWNER postgres;"
+          
+          # 3. Создаем новые миграции
           python manage.py makemigrations
-
-          # Применяем миграции к основной базе
+          
+          # 4. Применяем миграции к основной БД
           python manage.py migrate
-
-          # Создаем тестовую базу и применяем миграции
-          python manage.py create_test_db  # См. ниже кастомную команду
-
-          # Проверяем состояние
-          python manage.py showmigrations
+          
+          # 5. Удаляем и пересоздаем тестовую БД
+          PGPASSWORD=postgres psql -h localhost -U postgres -c "DROP DATABASE IF EXISTS test_test_db;"
+          PGPASSWORD=postgres psql -h localhost -U postgres -c "CREATE DATABASE test_test_db WITH TEMPLATE test_db OWNER postgres;"
+          
+          # 6. Проверяем структуру БД
+          PGPASSWORD=postgres psql -h localhost -U postgres -d test_test_db -c "\dt"
 
       - name: Run tests
         run: |
-          python manage.py test --noinput
+          python manage.py test --noinput --keepdb
 
   build:
     runs-on: ubuntu-latest
