@@ -8,6 +8,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         # Создаем тестовую БД
         with connections['default'].cursor() as cursor:
-            cursor.execute("CREATE DATABASE test_test_db WITH TEMPLATE test_db OWNER postgres;")
+            cursor.execute(
+                "CREATE DATABASE test_test_db WITH TEMPLATE test_db OWNER postgres;")
 
-        self.stdout.write(self.style.SUCCESS('Successfully created test database'))
+        self.stdout.write(self.style.SUCCESS
+                          ('Successfully created test database'))
