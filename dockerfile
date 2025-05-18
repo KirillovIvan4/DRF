@@ -1,5 +1,4 @@
-# Используем официальный slim-образ Python 3.12
-FROM python:3.12-slim
+FROM python:3.12-slim as django
 # Используем официальный образ Nginx
 FROM nginx:latest
 
