@@ -9,11 +9,13 @@ class CourseAdmin(admin.ModelAdmin):
     list_filter = ('name',)
     search_fields = ('name',)
 
+
 @admin.register(Lesson)
 class LessonAdmin(admin.ModelAdmin):
     list_display = ('pk', 'name',)
     list_filter = ('name',)
     search_fields = ('name',)
+
 
 @admin.register(Payments)
 class PaymentsAdmin(admin.ModelAdmin):

@@ -8,8 +8,12 @@ NULLBLE = {"blank": True, "null": True}
 class Course(models.Model):
     name = models.CharField(max_length=100, verbose_name="название курса")
     description = models.TextField(verbose_name="описание курса")
-    preview = models.ImageField(upload_to="course/", verbose_name="превью", **NULLBLE)
-    price_course = models.PositiveIntegerField(default=0, verbose_name="Цена за курс")
+    preview = models.ImageField(
+        upload_to="course/",
+        verbose_name="превью",
+        **NULLBLE)
+    price_course = models.PositiveIntegerField(
+        default=0, verbose_name="Цена за курс")
     creator = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -28,9 +32,13 @@ class Course(models.Model):
 class Lesson(models.Model):
     name = models.CharField(max_length=100, verbose_name="название урока")
     description = models.TextField(verbose_name="описание урока")
-    preview = models.ImageField(upload_to="lesson/", verbose_name="превью", **NULLBLE)
+    preview = models.ImageField(
+        upload_to="lesson/",
+        verbose_name="превью",
+        **NULLBLE)
     link_video = models.URLField(verbose_name="ссылка на видео", **NULLBLE)
-    price_lesson = models.PositiveIntegerField(default=0, verbose_name="Цена за урок")
+    price_lesson = models.PositiveIntegerField(
+        default=0, verbose_name="Цена за урок")
     creator = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -68,12 +76,22 @@ class Payments(models.Model):
         (BANK_TRANSFER, 'Банковский перевод'),
     ]
 
-    method_payment = models.CharField(max_length=100, choices=PAYMENT_METHOD, default=NOT_PAID,
-                                      verbose_name="способ оплаты")
+    method_payment = models.CharField(
+        max_length=100,
+        choices=PAYMENT_METHOD,
+        default=NOT_PAID,
+        verbose_name="способ оплаты")
     payment_amount = models.PositiveIntegerField(verbose_name="сумма оплаты")
-    payment_date = models.DateTimeField(auto_now_add=True, verbose_name="дата оплаты")
-    session_id = models.CharField(max_length=225, verbose_name="способ оплаты",**NULLBLE)
-    session_link = models.URLField(max_length=400, verbose_name="ссылка на оплату",**NULLBLE)
+    payment_date = models.DateTimeField(
+        auto_now_add=True, verbose_name="дата оплаты")
+    session_id = models.CharField(
+        max_length=225,
+        verbose_name="способ оплаты",
+        **NULLBLE)
+    session_link = models.URLField(
+        max_length=400,
+        verbose_name="ссылка на оплату",
+        **NULLBLE)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -100,8 +118,10 @@ class Payments(models.Model):
         verbose_name = "платёж"
         verbose_name_plural = "платежи"
 
+
 class Subscription(models.Model):
-    subscription_activated = models.BooleanField(default=False, verbose_name="подписка активирована")
+    subscription_activated = models.BooleanField(
+        default=False, verbose_name="подписка активирована")
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,

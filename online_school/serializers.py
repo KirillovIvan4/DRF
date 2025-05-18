@@ -7,6 +7,7 @@ from users.serializers import UserSerializer
 
 class LessonSerializer(serializers.ModelSerializer):
     link_video = serializers.URLField(validators=[validate_youtube_link])
+
     class Meta:
         model = Lesson
         fields = '__all__'
@@ -22,9 +23,9 @@ class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
         fields = '__all__'
+
     def get_subscription(self, instance):
         pass
-
 
     def get_last_lesson(self, instance):
         if instance.lesson.all():
@@ -42,4 +43,3 @@ class SubscriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subscription
         fields = '__all__'
-

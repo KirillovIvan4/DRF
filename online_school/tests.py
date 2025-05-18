@@ -11,8 +11,16 @@ class LessonTestCase(APITestCase):
     def setUp(self):
         # Подготовка данных перед каждым теcтом
         self.user = User.objects.create(email='admin@admin.com')
-        self.course = Course.objects.create(name='Физика', description='Уроки по Физики', creator=self.user)
-        self.lesson = Lesson.objects.create(name='Урок 1', description='Описание первого урока',link_video='http://www.youtube.com', course=self.course, creator=self.user)
+        self.course = Course.objects.create(
+            name='Физика',
+            description='Уроки по Физики',
+            creator=self.user)
+        self.lesson = Lesson.objects.create(
+            name='Урок 1',
+            description='Описание первого урока',
+            link_video='http://www.youtube.com',
+            course=self.course,
+            creator=self.user)
         self.client.force_authenticate(user=self.user)
 
     def test_lesson_retrieve(self):
@@ -91,14 +99,23 @@ class LessonTestCase(APITestCase):
         if 'url' in lesson_data:
             self.assertIsNone(lesson_data['url'])
 
+
 class SubscriptionTestCase(APITestCase):
 
     def setUp(self):
         # Подготовка данных перед каждым тестом
         self.user = User.objects.create(email='admin@admin.com')
-        self.course = Course.objects.create(name='Джанго', description='Уроки по Джанго', creator=self.user)
-        self.lesson = Lesson.objects.create(name='Урок 1', description='Начало', course=self.course, creator=self.user)
-        self.subscription = Subscription.objects.create(course=self.course, user=self.user)
+        self.course = Course.objects.create(
+            name='Джанго',
+            description='Уроки по Джанго',
+            creator=self.user)
+        self.lesson = Lesson.objects.create(
+            name='Урок 1',
+            description='Начало',
+            course=self.course,
+            creator=self.user)
+        self.subscription = Subscription.objects.create(
+            course=self.course, user=self.user)
         self.client.force_authenticate(user=self.user)
 
     def test_subscription(self):
@@ -113,4 +130,3 @@ class SubscriptionTestCase(APITestCase):
         self.assertEqual(
             response.data.get('message'), 'Подписка отключена'
         )
-

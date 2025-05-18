@@ -179,7 +179,7 @@ CORS_ALLOWED_ORIGINS = [
 
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8000',
-    'http://127.0.0.1:8000', # Замените на адрес вашего фронтенд-сервера
+    'http://127.0.0.1:8000',  # Замените на адрес вашего фронтенд-сервера
 
 ]
 
@@ -188,10 +188,10 @@ CORS_ALLOW_ALL_ORIGINS = False
 # Настройки для Celery
 
 # URL-адрес брокера сообщений
-#CELERY_BROKER_URL = 'redis://localhost:6379'
+# CELERY_BROKER_URL = 'redis://localhost:6379'
 CELERY_BROKER_URL = 'redis://redis:6379/0'
 # URL-адрес брокера результатов, также Redis
-#CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+# CELERY_RESULT_BACKEND = 'redis://localhost:6379'
 
 CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
 CELERY_ACCEPT_CONTENT = ['json']
@@ -213,4 +213,3 @@ CELERY_BEAT_SCHEDULE = {
     },
 }
 ADMIN_URL = 'admin/'
-

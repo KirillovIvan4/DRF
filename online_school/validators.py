@@ -4,9 +4,11 @@ import re
 
 
 allowed_video_link = [
-        'www.youtube.com',
+    'www.youtube.com',
 
-    ]
+]
+
+
 def validate_youtube_link(value):
     if not value:
         return
@@ -19,4 +21,5 @@ def validate_youtube_link(value):
 
     # Проверяем схему (http/https)
     if parsed.scheme not in ['http', 'https']:
-        raise ValidationError("Ссылка должна начинаться с http:// или https://")
+        raise ValidationError(
+            "Ссылка должна начинаться с http:// или https://")

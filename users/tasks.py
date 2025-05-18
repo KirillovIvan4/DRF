@@ -22,6 +22,6 @@ def check_user_is_active():
         last_login__lt=one_month_ago  # last_login раньше чем месяц назад
     )
     for inactive_user in inactive_users:
-        inactive_user.is_active=False
+        inactive_user.is_active = False
         inactive_user.save()
         print(f'Пользователь - {inactive_user} неактивен более месяца')

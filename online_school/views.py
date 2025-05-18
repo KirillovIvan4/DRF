@@ -24,7 +24,7 @@ class CourseViewSet(viewsets.ModelViewSet):
             self.permission_classes = [IsNotModer]
         elif self.action in ["destroy", "update"]:
             self.permission_classes = [IsCreator]
-        elif self.action in [ "retrieve"]:
+        elif self.action in ["retrieve"]:
             self.permission_classes = [IsAuthenticated]
         return super().get_permissions()
 
@@ -37,7 +37,7 @@ class CourseViewSet(viewsets.ModelViewSet):
 class LessonCreateAPIView(generics.CreateAPIView):
     serializer_class = LessonSerializer
 
-    def perform_create(self,serializer):
+    def perform_create(self, serializer):
         lesson = serializer.save()
         lesson.creator = self.request.user
         lesson.save()
@@ -48,14 +48,17 @@ class LessonCreateAPIView(generics.CreateAPIView):
             return [NOT(IsModer())]
         return super().get_permissions()
 
+
 class LessonListAPIView(generics.ListAPIView):
     serializer_class = LessonSerializer
     queryset = Lesson.objects.all()
     pagination_class = CastomPagination
 
+
 class LessonRetrieveAPIView(generics.RetrieveAPIView):
     serializer_class = LessonSerializer
     queryset = Lesson.objects.all()
+
 
 class LessonUpdateAPIView(generics.UpdateAPIView):
     serializer_class = LessonSerializer
@@ -66,6 +69,7 @@ class LessonUpdateAPIView(generics.UpdateAPIView):
             return [IsCreator]
         return super().get_permissions()
 
+
 class LessonDestroyAPIView(generics.DestroyAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
@@ -75,6 +79,7 @@ class LessonDestroyAPIView(generics.DestroyAPIView):
         if self.request.method == 'POST':
             return [IsCreator]
         return super().get_permissions()
+
 
 class PaymentsCreateAPIView(generics.CreateAPIView):
     serializer_class = PaymentsSerializer
@@ -93,7 +98,9 @@ class PaymentsCreateAPIView(generics.CreateAPIView):
             description = paid_lesson.description
         else:
             raise ValidationError("Не указан ни курс, ни урок для оплаты")
-        payments = serializer.save(user=self.request.user, payment_amount=payment_amount)
+        payments = serializer.save(
+            user=self.request.user,
+            payment_amount=payment_amount)
         product_id = create_stripe_product(name, description)
         price = create_stripe_price(payment_amount, product_id)
         session_id, session_link = create_stripe_session(price)
@@ -105,6 +112,7 @@ class PaymentsCreateAPIView(generics.CreateAPIView):
             return [NOT(IsModer())]
         return super().get_permissions()
 
+
 class PaymentsListAPIView(generics.ListAPIView):
     serializer_class = PaymentsSerializer
     queryset = Payments.objects.all()
@@ -112,6 +120,7 @@ class PaymentsListAPIView(generics.ListAPIView):
     filterset_fields = ('lesson', 'course')
     search_fields = ('method_payment',)
     ordering_fields = ('payment_date',)
+
 
 class SubscriptionAPIView(APIView):
     serializer_class = SubscriptionSerializer
