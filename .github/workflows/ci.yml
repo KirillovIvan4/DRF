@@ -70,7 +70,10 @@ jobs:
           PGPASSWORD=postgres psql -h localhost -U postgres -d test_db -c "SELECT 1"
 
       - name: Run migrations
-        run: python manage.py migrate
+        run:  # Удаляем все миграции кроме __init__.py
+            find . -path "*/migrations/*.py" -not -name "__init__.py" -delete
+            find . -path "*/migrations/*.pyc" -delete
+            python manage.py migrate
 
       - name: Run tests
         run: python manage.py test
