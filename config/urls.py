@@ -37,7 +37,6 @@ urlpatterns = [
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0),
          name='schema-redoc'),
     path('health/', lambda request: HttpResponse(status=200)),
-    path(f'{settings.ADMIN_URL}', admin.site.urls),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL,
