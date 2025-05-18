@@ -71,16 +71,22 @@ jobs:
 
       - name: Run migrations
         run: |
-          # Очистка базы данных
+          # Очистка и создание базы данных
           PGPASSWORD=postgres psql -h localhost -U postgres -c "DROP DATABASE IF EXISTS test_db;"
           PGPASSWORD=postgres psql -h localhost -U postgres -c "CREATE DATABASE test_db WITH OWNER postgres;"
-
-          # Чистые миграции
+          
+          # Удаление всех миграций
           find . -path "*/migrations/*.py" -not -name "__init__.py" -delete
           find . -path "*/migrations/*.pyc" -delete
-
-          # Применение миграций
-          python manage.py makemigrations
+          
+          # Создание начальных миграций
+          python manage.py makemigrations users  # Сначала создаем миграции для users
+          python manage.py makemigrations       # Затем для остальных приложений
+          
+          # Применение миграций в правильном порядке
+          python manage.py migrate auth
+          python manage.py migrate contenttypes
+          python manage.py migrate users
           python manage.py migrate
 
       - name: Run tests
