@@ -21,6 +21,7 @@ class PaymentsAdmin(admin.ModelAdmin):
     list_filter = ('user',)
     search_fields = ('user',)
 
+
 @admin.register(Subscription)
 class SubscriptionAdmin(admin.ModelAdmin):
     list_display = ('pk', 'user', 'subscription_activated', 'course',)

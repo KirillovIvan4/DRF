@@ -24,4 +24,4 @@ def check_user_is_active():
     for inactive_user in inactive_users:
         inactive_user.is_active=False
         inactive_user.save()
-        print(f'Пользователь - {inactive_user} неактивен более месяца' )
+        print(f'Пользователь - {inactive_user} неактивен более месяца')

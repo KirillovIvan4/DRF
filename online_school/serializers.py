@@ -1,7 +1,4 @@
 from rest_framework import serializers
-from rest_framework.views import APIView
-from rest_framework.generics import  get_object_or_404
-from rest_framework.response import Response
 
 from online_school.models import Course, Lesson, Payments, Subscription
 from online_school.validators import validate_youtube_link
@@ -33,8 +30,6 @@ class CourseSerializer(serializers.ModelSerializer):
         if instance.lesson.all():
             return instance.lesson.all().count()
         return 0
-
-
 
 
 class PaymentsSerializer(serializers.ModelSerializer):

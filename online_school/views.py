@@ -21,7 +21,7 @@ class CourseViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in ["create"]:
-            self.permission_classes = [ IsNotModer]
+            self.permission_classes = [IsNotModer]
         elif self.action in ["destroy", "update"]:
             self.permission_classes = [IsCreator]
         elif self.action in [ "retrieve"]:
@@ -39,7 +39,7 @@ class LessonCreateAPIView(generics.CreateAPIView):
 
     def perform_create(self,serializer):
         lesson = serializer.save()
-        lesson.creator =self.request.user
+        lesson.creator = self.request.user
         lesson.save()
         test_calery.delay()
 
@@ -60,7 +60,6 @@ class LessonRetrieveAPIView(generics.RetrieveAPIView):
 class LessonUpdateAPIView(generics.UpdateAPIView):
     serializer_class = LessonSerializer
     queryset = Lesson.objects.all()
-    #permission_classes = [IsAuthenticated]
 
     def get_permissions(self):
         if self.request.method == 'POST':
