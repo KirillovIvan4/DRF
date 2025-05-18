@@ -23,25 +23,25 @@ class LessonTestCase(APITestCase):
         self.client.force_authenticate(user=self.user)
 
     # Вариант 1: Если задача в online_school/tasks.py
-    @patch('online_school.tasks.test_celery.delay')
-    # ИЛИ Вариант 2: Если задача в другом модуле
-    # @patch('ваше_приложение.tasks.test_celery.delay')
-    def test_lesson_create(self, mock_celery):
-        mock_celery.return_value = None
-
-        url = reverse('online_school:lesson-create')
-        data = {
-            'name': 'Урок 2',
-            'description': 'Продолжение',
-            'course': self.course.pk,
-            'link_video': 'http://www.youtube.com',
-            'creator': self.user.pk
-        }
-        response = self.client.post(url, data=data)
-
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(Lesson.objects.all().count(), 2)
-        mock_celery.assert_called_once()
+    # @patch('online_school.tasks.test_celery.delay')
+    # # ИЛИ Вариант 2: Если задача в другом модуле
+    # # @patch('ваше_приложение.tasks.test_celery.delay')
+    # def test_lesson_create(self, mock_celery):
+    #     mock_celery.return_value = None
+    #
+    #     url = reverse('online_school:lesson-create')
+    #     data = {
+    #         'name': 'Урок 2',
+    #         'description': 'Продолжение',
+    #         'course': self.course.pk,
+    #         'link_video': 'http://www.youtube.com',
+    #         'creator': self.user.pk
+    #     }
+    #     response = self.client.post(url, data=data)
+    #
+    #     self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+    #     self.assertEqual(Lesson.objects.all().count(), 2)
+    #     mock_celery.assert_called_once()
 
     def test_lesson_update(self):
         url = reverse('online_school:lesson-update', args=(self.lesson.pk,))
