@@ -36,7 +36,7 @@ class LessonTestCase(APITestCase):
             data.get('name'), self.lesson.name
         )
 
-    @patch('online_school.views.test_celery.delay')  # Мокаем Celery задачу
+    @patch('online_school.tasks.test_celery.delay')  # Мокаем Celery задачу
     def test_lesson_create(self, mock_celery):
         mock_celery.return_value = None  # Задаем возвращаемое значение
 
