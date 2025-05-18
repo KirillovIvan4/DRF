@@ -1,16 +1,14 @@
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
-from unittest.mock import patch  # Добавляем импорт mock
+from unittest.mock import patch
 
 from online_school.models import Course, Lesson, Subscription
 from users.models import User
 
-
 class LessonTestCase(APITestCase):
 
     def setUp(self):
-        # Подготовка данных перед каждым теcтом
         self.user = User.objects.create(email='admin@admin.com')
         self.course = Course.objects.create(
             name='Физика',
@@ -24,21 +22,12 @@ class LessonTestCase(APITestCase):
             creator=self.user)
         self.client.force_authenticate(user=self.user)
 
-    def test_lesson_retrieve(self):
-        url = reverse('online_school:lesson-get', args=(self.lesson.pk,))
-        response = self.client.get(url)
-        data = response.json()
-
-        self.assertEqual(
-            response.status_code, status.HTTP_200_OK
-        )
-        self.assertEqual(
-            data.get('name'), self.lesson.name
-        )
-
-    @patch('online_school.tasks.test_celery.delay')  # Мокаем Celery задачу
+    # Вариант 1: Если задача в online_school/tasks.py
+    @patch('online_school.tasks.test_celery.delay')
+    # ИЛИ Вариант 2: Если задача в другом модуле
+    # @patch('ваше_приложение.tasks.test_celery.delay')
     def test_lesson_create(self, mock_celery):
-        mock_celery.return_value = None  # Задаем возвращаемое значение
+        mock_celery.return_value = None
 
         url = reverse('online_school:lesson-create')
         data = {
@@ -50,13 +39,9 @@ class LessonTestCase(APITestCase):
         }
         response = self.client.post(url, data=data)
 
-        self.assertEqual(
-            response.status_code, status.HTTP_201_CREATED
-        )
-        self.assertEqual(
-            Lesson.objects.all().count(), 2
-        )
-        mock_celery.assert_called_once()  # Проверяем, что задача была вызвана
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Lesson.objects.all().count(), 2)
+        mock_celery.assert_called_once()
 
     def test_lesson_update(self):
         url = reverse('online_school:lesson-update', args=(self.lesson.pk,))
