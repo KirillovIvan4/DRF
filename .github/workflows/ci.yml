@@ -137,32 +137,25 @@ jobs:
       - name: Push Docker image to Docker Hub
         run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
 
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
+  name: Deploy App
 
-      # Настройка SSH (лучшая практика)
-      - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+  on: [ push ]
 
-      # Критически важный шаг: добавляем хост в known_hosts
-      - name: Add server to known hosts
-        run: |
-          mkdir -p ~/.ssh
-          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
-          # Для домена используйте:
-          # ssh-keyscan -H yourdomain.com >> ~/.ssh/known_hosts
+  jobs:
+    deploy:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v4
 
-      # Деплой с проверкой подключения
-      - name: Deploy to Server
-        run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_IP }} "
-            echo 'Успешное подключение к серверу!'
-            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
-            docker stop myapp || true
-            docker rm myapp || true
-            docker run -d --name myapp -p 80:8000 ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
-          "
+        - name: Add SSH Keys
+          uses: shimataro/ssh-key-action@v2
+          with:
+            key: ${{ secrets.SSH_PRIVATE_KEY }}
+            known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
+
+        - name: Execute Deployment
+          run: |
+            ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@158.160.148.53 "
+              docker pull your_image:latest
+              docker-compose up -d
+            "
