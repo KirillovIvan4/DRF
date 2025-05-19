@@ -141,21 +141,20 @@ jobs:
 
   on: [ push ]
 
-  jobs:
-    deploy:
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v4
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-        - name: Add SSH Keys
-          uses: shimataro/ssh-key-action@v2
-          with:
-            key: ${{ secrets.SSH_PRIVATE_KEY }}
-            known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
+      - name: Add SSH Keys
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
 
-        - name: Execute Deployment
-          run: |
-            ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@158.160.148.53 "
-              docker pull your_image:latest
-              docker-compose up -d
-            "
+      - name: Execute Deployment
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@158.160.148.53 "
+            docker pull your_image:latest
+            docker-compose up -d
+          "
