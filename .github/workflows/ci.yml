@@ -142,26 +142,27 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      # Вариант 1 (предпочтительный)
+      # Настройка SSH (лучшая практика)
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      # Или Вариант 2
-      # - name: Add SSH key
-      #   uses: actions/checkout@v3
-      #   with:
-      #     ssh-key: ${{ secrets.SSH_KEY }}
+      # Критически важный шаг: добавляем хост в known_hosts
+      - name: Add server to known hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+          # Для домена используйте:
+          # ssh-keyscan -H yourdomain.com >> ~/.ssh/known_hosts
 
+      # Деплой с проверкой подключения
       - name: Deploy to Server
         run: |
-           ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_IP }} "
-             echo ${{ secrets.DOCKER_HUB_TOKEN }} | docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
-           "
-           ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_IP }} "docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}"
-           ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_IP }} "docker stop myapp || true"
-           ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_IP }} "docker rm myapp || true"
-           ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_IP }} "
-             docker run -d --name myapp -p 80:8000 ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
-           "
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_IP }} "
+            echo 'Успешное подключение к серверу!'
+            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
+            docker stop myapp || true
+            docker rm myapp || true
+            docker run -d --name myapp -p 80:8000 ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
+          "
