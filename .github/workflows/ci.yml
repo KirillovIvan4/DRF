@@ -137,6 +137,22 @@ jobs:
       - name: Push Docker image to Docker Hub
         run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
 
+
+  deploy:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v4
+
+        - name: Configure SSH
+          uses: webfactory/ssh-agent@v0.9.0
+          with:
+            ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+        - name: Add known hosts
+          run: ssh-keyscan ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+
+        - name: Deploy via SSH
+          run: ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "docker-compose up -d"
 #  deploy:
 #    runs-on: ubuntu-latest
 #    steps:
@@ -154,19 +170,4 @@ jobs:
 #          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
 #
 #      - name: Deploy
-#        run: ssh user@host "docker-compose up -d"
-    deploy:
-        runs-on: ubuntu-latest
-        steps:
-          - uses: actions/checkout@v4
-
-          - name: Configure SSH
-            uses: webfactory/ssh-agent@v0.9.0
-            with:
-              ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-          - name: Add known hosts
-            run: ssh-keyscan ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
-
-          - name: Deploy via SSH
-            run: ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "docker-compose up -d"
+#        run: ssh user@host "docker-compose up -d
