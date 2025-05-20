@@ -66,6 +66,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install psycopg2-binary
+          pip install python-dotenv 
 
       - name: Wait for PostgreSQL
         run: sleep 10  # Даем время PostgreSQL для запуска
