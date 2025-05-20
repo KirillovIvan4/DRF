@@ -1,10 +1,10 @@
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
-from unittest.mock import patch
 
 from online_school.models import Course, Lesson, Subscription
 from users.models import User
+
 
 class LessonTestCase(APITestCase):
 
