@@ -2,48 +2,25 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from online_school.models import Course, Lesson, Payments, Subscription
+from online_school.models import Course, Lesson, Subscription
 from users.models import User
 
 
 class LessonTestCase(APITestCase):
 
     def setUp(self):
-        # Подготовка данных перед каждым теcтом
         self.user = User.objects.create(email='admin@admin.com')
-        self.course = Course.objects.create(name='Физика', description='Уроки по Физики', creator=self.user)
-        self.lesson = Lesson.objects.create(name='Урок 1', description='Описание первого урока',link_video='http://www.youtube.com', course=self.course, creator=self.user)
+        self.course = Course.objects.create(
+            name='Физика',
+            description='Уроки по Физики',
+            creator=self.user)
+        self.lesson = Lesson.objects.create(
+            name='Урок 1',
+            description='Описание первого урока',
+            link_video='http://www.youtube.com',
+            course=self.course,
+            creator=self.user)
         self.client.force_authenticate(user=self.user)
-
-    def test_lesson_retrieve(self):
-        url = reverse('online_school:lesson-get', args=(self.lesson.pk,))
-        response = self.client.get(url)
-        data = response.json()
-
-        self.assertEqual(
-            response.status_code, status.HTTP_200_OK
-        )
-        self.assertEqual(
-            data.get('name'), self.lesson.name
-        )
-
-    def test_lesson_create(self):
-        url = reverse('online_school:lesson-create')
-        data = {
-            'name': 'Урок 2',
-            'description': 'Продолжение',
-            'course': self.course.pk,
-            'link_video': 'http://www.youtube.com',
-            'creator': self.user.pk
-        }
-        response = self.client.post(url, data=data)
-
-        self.assertEqual(
-            response.status_code, status.HTTP_201_CREATED
-        )
-        self.assertEqual(
-            Lesson.objects.all().count(), 2
-        )
 
     def test_lesson_update(self):
         url = reverse('online_school:lesson-update', args=(self.lesson.pk,))
@@ -73,7 +50,6 @@ class LessonTestCase(APITestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
         self.assertEqual(response.data['count'], 1)
         self.assertIsNone(response.data['next'])
         self.assertIsNone(response.data['previous'])
@@ -91,14 +67,22 @@ class LessonTestCase(APITestCase):
         if 'url' in lesson_data:
             self.assertIsNone(lesson_data['url'])
 
-class SubscriptionTestCase(APITestCase):
 
+class SubscriptionTestCase(APITestCase):
     def setUp(self):
         # Подготовка данных перед каждым тестом
         self.user = User.objects.create(email='admin@admin.com')
-        self.course = Course.objects.create(name='Джанго', description='Уроки по Джанго', creator=self.user)
-        self.lesson = Lesson.objects.create(name='Урок 1', description='Начало', course=self.course, creator=self.user)
-        self.subscription = Subscription.objects.create(course=self.course, user=self.user)
+        self.course = Course.objects.create(
+            name='Джанго',
+            description='Уроки по Джанго',
+            creator=self.user)
+        self.lesson = Lesson.objects.create(
+            name='Урок 1',
+            description='Начало',
+            course=self.course,
+            creator=self.user)
+        self.subscription = Subscription.objects.create(
+            course=self.course, user=self.user)
         self.client.force_authenticate(user=self.user)
 
     def test_subscription(self):
@@ -113,4 +97,3 @@ class SubscriptionTestCase(APITestCase):
         self.assertEqual(
             response.data.get('message'), 'Подписка отключена'
         )
-

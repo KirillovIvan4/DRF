@@ -33,7 +33,7 @@ DEBUG = True if os.getenv('DEBUG') == "True" else False
 if DEBUG:
     HEALTH_CHECK_WHITELIST = ['127.0.0.1', 'localhost', 'web']
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'web']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -95,31 +95,37 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     'default': {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv('NAME'),
-        "USER": os.getenv('USER'),
-        "PASSWORD": os.getenv('PASSWORD'),
-        "HOST": os.getenv('HOST'),
-        "PORT": os.getenv('PORT')
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME', 'test_db'),
+        'USER': os.getenv('DB_USER', 'postgres'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'postgres'),
+        'HOST': os.getenv('DB_HOST', 'localhost'),
+        'PORT': os.getenv('DB_PORT', '5432'),
+        'OPTIONS': {
+            'connect_timeout': 5,  # Таймаут подключения 5 секунд
+        },
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'NAME': 'django.contrib.auth.password_validation.'
+                'UserAttributeSimilarityValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'NAME': 'django.contrib.auth.password_validation.'
+                'MinimumLengthValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        'NAME': 'django.contrib.auth.password_validation.'
+                'CommonPasswordValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        'NAME': 'django.contrib.auth.password_validation.'
+                'NumericPasswordValidator',
     },
 ]
 
@@ -152,7 +158,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = os.getenv('EMAIL_HOST')
-EMAIL_PORT = int(os.getenv('EMAIL_PORT'))
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', 465))
 EMAIL_USE_TLS = True if os.getenv('EMAIL_USE_TLS') == "True" else False
 EMAIL_USE_SSL = True if os.getenv('EMAIL_USE_SSL') == "True" else False
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
@@ -174,13 +180,13 @@ REST_FRAMEWORK = {
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:8000',
-    'http://127.0.0.1:8000',# Замените на адрес вашего фронтенд-сервера
+    'http://127.0.0.1:8000',  # Замените на адрес вашего фронтенд-сервера
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8000',
-    'http://127.0.0.1:8000', #  Замените на адрес вашего фронтенд-сервера
-    # и добавьте адрес бэкенд-сервера
+    'http://127.0.0.1:8000',  # Замените на адрес вашего фронтенд-сервера
+
 ]
 
 CORS_ALLOW_ALL_ORIGINS = False
@@ -188,12 +194,15 @@ CORS_ALLOW_ALL_ORIGINS = False
 # Настройки для Celery
 
 # URL-адрес брокера сообщений
-#CELERY_BROKER_URL = 'redis://localhost:6379'
+# CELERY_BROKER_URL = 'redis://localhost:6379'
 CELERY_BROKER_URL = 'redis://redis:6379/0'
 # URL-адрес брокера результатов, также Redis
-#CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+# CELERY_RESULT_BACKEND = 'redis://localhost:6379'
 
 CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
 # Часовой пояс для работы Celery
 CELERY_TIMEZONE = TIME_ZONE
 
@@ -209,3 +218,4 @@ CELERY_BEAT_SCHEDULE = {
         "schedule": timedelta(days=1),
     },
 }
+ADMIN_URL = 'admin/'

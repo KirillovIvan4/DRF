@@ -1,5 +1,4 @@
-# Используем официальный slim-образ Python 3.12
-FROM python:3.12-slim
+FROM python:3.12-slim as django
 # Используем официальный образ Nginx
 FROM nginx:latest
 
@@ -27,7 +26,7 @@ COPY requirements.txt .
 COPY nginx.conf /etc/nginx/nginx.conf
 
 # Копируем статические файлы веб-сайта в директорию для обслуживания
-COPY html/ /usr/share/nginx/html/
+COPY frontend/ /usr/share/nginx/html/
 
 # Устанавливаем зависимости Python (исправлено: объединено в один RUN)
 RUN pip install --no-cache-dir -r requirements.txt python-dotenv

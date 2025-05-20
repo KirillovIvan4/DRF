@@ -6,8 +6,6 @@ from config.settings import EMAIL_HOST_USER
 from online_school.models import Subscription
 
 
-
-
 @shared_task
 def mail_update_course_info(course_id):
     """Отправка сообщения об обновлении курса по подписке"""
@@ -31,6 +29,8 @@ def mail_update_course_info(course_id):
             recipient_list=recipient_list,
             fail_silently=fail_silently
         )
+
+
 @shared_task
 def test_calery():
     print("Работает!!!")

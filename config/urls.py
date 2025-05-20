@@ -7,10 +7,12 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from django.http import JsonResponse
+from django.http import HttpResponse
 
 
 def health_check(request):
     return JsonResponse({"status": "ok"})
+
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -30,9 +32,12 @@ urlpatterns = [
     path('users/', include('users.urls', namespace='users')),
     path('', include('online_school.urls', namespace='online_school')),
 
-    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
-    path('health/', health_check),
+    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0),
+         name='schema-swagger-ui'),
+    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0),
+         name='schema-redoc'),
+    path('health/', lambda request: HttpResponse(status=200)),
 ]
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.MEDIA_URL,
+                          document_root=settings.MEDIA_ROOT)

@@ -1,4 +1,4 @@
-from rest_framework import viewsets, generics, permissions
+from rest_framework import generics, permissions
 
 from users.models import User
 from users.serializers import UserSerializer
@@ -9,7 +9,7 @@ class UserCreateAPIView(generics.CreateAPIView):
     queryset = User.objects.all()
     permission_classes = (permissions.AllowAny,)
 
-    def perform_create(self,serializer):
+    def perform_create(self, serializer):
         user = serializer.save(is_active=True)
         user.set_password(user.password)
         user.save()

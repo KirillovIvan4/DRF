@@ -1,5 +1,4 @@
 from celery import shared_task
-from django.core.mail import send_mail
 from datetime import timedelta
 from django.utils import timezone
 
@@ -22,6 +21,6 @@ def check_user_is_active():
         last_login__lt=one_month_ago  # last_login раньше чем месяц назад
     )
     for inactive_user in inactive_users:
-        inactive_user.is_active=False
+        inactive_user.is_active = False
         inactive_user.save()
-        print(f'Пользователь - {inactive_user} неактивен более месяца' )
+        print(f'Пользователь - {inactive_user} неактивен более месяца')
